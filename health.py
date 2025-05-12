@@ -1,5 +1,6 @@
 import pymysql
-from pymysql.cursors import DictCursor  # 确保导入 DictCursor
+
+from database import db_config # 从database.py中导入数据库配置
 LOWBP = (130+80)/2
 HIGHBP = (140+90)/2
 
@@ -12,17 +13,6 @@ HIGHBP = (140+90)/2
 其中列名作为字典的键，列的值作为字典的值
 
 '''
-# 数据库配置
-db_config = {
-    "user": "root",
-    "password": "200329",
-    "host": "127.0.0.1",
-    "port": 3306,
-    "database": "health",
-    "charset": "utf8mb4",  # utf-8 改成 utf8mb4 更通用
-    "cursorclass": DictCursor  # 注意：这里不是字符串，而是类名
-}
-
 
 def judgeLipids(value: float) -> str:
     if value > 0 and value < 3:

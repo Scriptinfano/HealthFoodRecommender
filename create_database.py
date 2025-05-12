@@ -2,17 +2,9 @@
 这个脚本用于删除并重新创建 health 库
 """
 import pymysql
-from pymysql.cursors import DictCursor
-
+from database import db_config as base_config
 # 连接配置（不指定 database，先连接到 MySQL）
-base_config = {
-    "user": "root",
-    "password": "200329",
-    "host": "127.0.0.1",
-    "port": 3306,
-    "charset": "utf8mb4",
-    "cursorclass": DictCursor
-}
+
 
 # 要创建的数据库名
 db_name = "health"
@@ -73,13 +65,15 @@ INSERT INTO dinner (food_name, food_code, description) VALUES
 statements = [stmt.strip()
               for stmt in ddl_sql.strip().split(';') if stmt.strip()]
 
+connection = None  # 提前定义
+
 try:
     connection = pymysql.connect(**base_config)
     with connection.cursor() as cursor:
         # 删除数据库
         cursor.execute(f"DROP DATABASE IF EXISTS {db_name};")
         print(f"✅ 数据库 {db_name} 已删除！")
-        print(f"即将重新创建数据库...")
+        print("即将重新创建数据库...")
         # 创建数据库并使用
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
         cursor.execute(f"USE {db_name};")
@@ -89,7 +83,11 @@ try:
             cursor.execute(stmt)
         connection.commit()
         print(f"✅ 数据库 {db_name} 及所有表和数据创建成功！")
+
 except Exception as e:
     print("❌ 出错了：", e)
+
 finally:
-    connection.close()
+    if connection:  # 只有在连接成功的情况下才关闭
+        connection.close()
+
